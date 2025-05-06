@@ -44,7 +44,8 @@
         method: 'GET',
         headers: {
           accept: '*/*',
-          Authorization: `Bearer ${apiKey}`
+          Authorization: `Bearer ${apiKey}`,
+          Access-Control-Allow-Origin: *
         }
       });
 
