@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Orders Table</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+  </style>
+</head>
+<body>
+  <h2>Orders</h2>
+  <table id="ordersTable">
+    <thead>
+      <tr>
+        <th>Maker</th>
+        <th>Price (BERA)</th>
+        <th>Token ID</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const tableBody = document.querySelector("#ordersTable tbody");
+    const apiKey = 'YOUR_API_KEY'; // Replace with your actual API key
+
+    const fetchOrders = async (continuation = null) => {
+      let url = 'https://api-mainnet.magiceden.dev/v3/rtp/berachain/orders/asks/v5?contracts=0x88888888A9361f15AAdBAca355A6B2938C6A674e&includeCriteriaMetadata=false&includeRawData=false&includeDynamicPricing=false&excludeEOA=false&normalizeRoyalties=false&sortBy=createdAt';
+      if (continuation) url += `&continuation=${continuation}`;
+
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          accept: '*/*',
+          Authorization: `Bearer ${apiKey}`
+        }
+      });
+
+      const data = await res.json();
+
+      data.orders.forEach(order => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${order.maker}</td>
+          <td>${order.price.amount.decimal}</td>
+          <td>${order.criteria.data.token.tokenId}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+
+      if (data.continuation) {
+        await fetchOrders(data.continuation);
+      }
+    };
+
+    fetchOrders();
+  </script>
+</body>
+</html>
